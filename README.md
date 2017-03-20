@@ -3,7 +3,7 @@
 Compare WiFi performances between different ESP modules
 
 - Runs 100 scans of your neighbourhood and for each scan Stores MAC addresses and rssi.
-- Outputs some statistics on the scan results and the average RSSi for each Mac.
+- Outputs some statistics on the scan results and the average RSSi for each MAc.
 
 
 Output example:
@@ -23,4 +23,4 @@ Average RSSI for 01:37:B7:7B:5F:12 is -51 (4 hits)
 
 `Total APs found` how many unique APs found during the 100 rounds
 `highest` the highest amount of AP returned in all 100 rounds
-`hits` how many times this mac address showed up in the 100 rounds
+`hits` how many times this MAC address showed up in the 100 rounds
