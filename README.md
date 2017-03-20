@@ -3,7 +3,7 @@
 Compare WiFi performances between different ESP modules
 
 - Runs 100 scans of your neighbourhood and for each scan Stores MAC addresses and rssi.
-- Outputs some statistics on the scan results and the average RSSi for each MAc.
+- Outputs some statistics on the scan results and the average RSSi for each MAC.
 
 
 Output example:
