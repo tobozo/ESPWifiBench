@@ -5,7 +5,7 @@
 #include <ESP8266WiFi.h>
 #endif
 
-#define maxrounds 100
+#define maxrounds 50 // how many scans will be performed before printing stats
 #define maxmacs 150 // increase this if you get LIST FULL messages, decrease if you run in a reset loop
 
 unsigned int rounds = 0;
@@ -54,7 +54,11 @@ void setup() {
     Serial.begin(115200);
 
     // Set WiFi to station mode and disconnect from an AP if it was previously connected
-    WiFi.mode(WIFI_STA);
+    #ifdef ESP32
+    WiFi.mode(WIFI_MODE_APSTA);
+    #else
+    WiFi.mode(WIFI_AP_STA);
+    #endif
     WiFi.disconnect();
     delay(100);
     Serial.println("Setup done");
@@ -65,13 +69,13 @@ void setup() {
       maclist[i][2] = "0";
     }
 
+    WiFi.printDiag(Serial);
+
 }
 
 void loop() {
 
   if(done==true) {
-    delay(5000);
-    Serial.print(".");
     return;
   }
 
@@ -87,12 +91,14 @@ void loop() {
     long minaps = maxmacs;
     long avgrssi = 0;
     long totalrssi = 0;
+    int totalhits = 0;
     
     for(int i=0;i<maxmacs;i++) {
       if(maclist[i][0]=="") continue;
       totalaps++;
       avgrssi = (long) ((maclist[i][2]).toInt() / (maclist[i][1]).toInt());
       Serial.println("Average RSSI for " + maclist[i][0] + " is " + String(avgrssi) + " ("+ maclist[i][1] +" hits)");
+      totalhits += (maclist[i][1]).toInt();
     }
 
     for(int i=0;i<maxrounds;i++) {
@@ -104,7 +110,7 @@ void loop() {
     avgaps = avgaps / maxrounds;
 
     Serial.println("Scanned " + String(maxrounds) + " rounds");
-    Serial.println("Total APs found: " + String(totalaps));
+    Serial.println("Total APs found: " + String(totalaps) + " / hits: " + String(totalhits));
     if(totalaps>=maxmacs) {
       Serial.println("Registry was full, averages and total may be inacurate");
     }
@@ -112,7 +118,6 @@ void loop() {
     Serial.println();
     
     return;
-    
   }
   
   Serial.print("round #");
@@ -120,7 +125,11 @@ void loop() {
   Serial.print(" .. ");
 
   // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
+  #ifdef ESP32
+  int n = WiFi.scanNetworks(false, true, false, 300);
+  #else
+  int n = WiFi.scanNetworks(false, true);
+  #endif
   if (n == 0) {
       Serial.println("no networks found");
   } else {
